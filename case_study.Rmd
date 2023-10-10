@@ -1,0 +1,102 @@
+---
+title: "reading_data_from_web"
+output: html_document
+date: "2023-10-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## AirBnB data brainstorming
+
+### Brainstorm questions
+
+- Where are AirBNBs expensive? 
+  - Borough, Neighborhood? 
+  - do other factors (room type) affect price? what about rating?
+- how long are AirBNBs active? 
+- which units have the most availability? 
+- how many apts are run by one host? 
+- where are AirBNBs? 
+  - Borough? Neighborhood? 
+  - Lat and Long? 
+  
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+
+data(nyc_airbnb)
+
+nyc_airbnb = 
+  nyc_airbnb |> 
+  rename(borough = neighbourhood_group) |> 
+  mutate(stars = review_scores_location / 2)
+```
+
+## Some EDA
+Where are AirBNBs? Borough, neighborhood? lat and long? 
+
+```{r}
+nyc_airbnb |> 
+  group_by(borough, neighbourhood) |> 
+  count(borough, neighbourhood) |> 
+  arrange(desc(n))
+
+nyc_airbnb |> 
+  count(borough)
+```
+
+where are the most expensive AirBnBs by borough? 
+
+```{r}
+nyc_airbnb |> 
+  group_by(borough, room_type) |> 
+  summarize(median_price = median(price)) |> 
+  pivot_wider(
+    names_from = room_type,
+    values_from = median_price
+  )
+```
+
+some visualizations to go with this
+
+```{r}
+nyc_airbnb |> 
+  ggplot(aes(x = price)) + 
+  geom_histogram() +
+  facet_grid(borough ~ room_type)
+```
+
+```{r}
+nyc_airbnb |> 
+  filter(price >= 9500)
+```
+
+```{r}
+nyc_airbnb |> 
+  filter(price < 1000, room_type == "Entire home/apt") |> 
+  ggplot(aes(x = price)) + 
+  geom_histogram() +
+  facet_grid(borough ~ room_type)
+```
+
+where in manhattan are airbnbs most expensive? 
+
+```{r}
+nyc_airbnb |> 
+  filter(
+    price < 1000,
+    room_type == "Entire home/apt",
+    borough == "Manhattan") |> 
+  group_by(neighbourhood) |> 
+  summarize(
+    n_apt = n(),
+    mean_price = mean(price)) |> 
+    arrange(desc(mean_price))
+``` 
+
+
+
+
+
