@@ -1,5 +1,5 @@
 ---
-title: "reading_data_from_web"
+title: "AirBnb Case Study"
 output: html_document
 date: "2023-10-10"
 ---
@@ -24,6 +24,9 @@ knitr::opts_chunk$set(echo = TRUE)
   
 ```{r}
 library(tidyverse)
+library(ggridges)
+library(leaflet)
+
 library(p8105.datasets)
 
 data(nyc_airbnb)
@@ -35,6 +38,7 @@ nyc_airbnb =
 ```
 
 ## Some EDA
+
 Where are AirBNBs? Borough, neighborhood? lat and long? 
 
 ```{r}
@@ -93,8 +97,60 @@ nyc_airbnb |>
   summarize(
     n_apt = n(),
     mean_price = mean(price)) |> 
-    arrange(desc(mean_price))
+    arrange(mean_price)
 ``` 
+
+```{r}
+nyc_airbnb |> 
+  filter(
+    price < 1000,
+    room_type == "Entire home/apt",
+    borough == "Manhattan") |> 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) |> 
+  ggplot(aes(x = price, y = neighbourhood)) + 
+  geom_density_ridges()
+```
+
+^^? problem with ggridges? investigate
+
+^ mutate(neighbourhood = fct_reorer(x, y)) to reorder ggplot by manipulating factor variables in dataframe rather than trying to format the ggplot itself
+
+## Try to make a map
+
+```{r}
+nyc_airbnb |> 
+  filter(
+    price < 1000,
+    room_type == "Entire home/apt",
+    borough == "Manhattan") |> 
+  ggplot(aes(x = lat, y = long, color = price)) + 
+  geom_point()
+```
+
+Try something else entirely (aka googling another option, leaflet plot?)
+
+```{r}
+nyc_airbnb |> 
+  filter(
+    price < 1000,
+    room_type == "Entire home/apt",
+    borough == "Manhattan") |> 
+  sample_n(500) |> 
+  leaflet() |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addCircleMarkers(~lat, ~long, radius = .5)
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
