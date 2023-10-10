@@ -37,7 +37,7 @@ nyc_airbnb =
   mutate(stars = review_scores_location / 2)
 ```
 
-## Some EDA
+## Some EDA!!
 
 Where are AirBNBs? Borough, neighborhood? lat and long? 
 
