@@ -1,0 +1,141 @@
+---
+title: "Reading in data from the web"
+output: html_document
+date: "2023-10-10"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+library(httr)
+
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+Import NSDUH data
+
+```{r}
+url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+
+drug_use_html = read_html(url)
+
+drug_use_html
+```
+
+put imported data into a tibble: 
+
+```{r}
+drug_use_html |> 
+  html_table()
+```
+
+now, take the first out of the many, many tables in the tibble: 
+
+```{r}
+marj_use_df = 
+  drug_use_html |> 
+  html_table() |> 
+  first() |> 
+  slice(-1)
+```
+
+^ add slice(-1) to remove the first row in a dataframe table
+
+NYC cost of living example:
+
+```{r}
+nyc_cost = 
+  read_html("https://www.bestplaces.net/cost_of_living/city/new_york/new_york") |>
+  html_table(header = TRUE) |>
+  first()
+```
+
+Import star wars from webpage
+
+```{r}
+swm_html = 
+  read_html("https://www.imdb.com/list/ls070150896/")
+```
+
+
+```{r}
+swm_title_vec = 
+  swm_html |> 
+  html_elements(".lister-item-header a") |> 
+  html_text()
+
+swm_gross_rev_vec = 
+  swm_html |> 
+  html_elements(".text-small:nth-child(7) span:nth-child(5)") |> 
+  html_text()
+
+swm_df = 
+  tibble(
+    title = swm_title_vec,
+    gross_rev = swm_gross_rev_vec
+  )
+```
+
+^ this scrapes the star wars page, takes each of the title and gross revenue small dataframes, puts them together in one dataframe place 
+
+## API 
+
+get water data from NYC
+
+```{r}
+nyc_water_df = 
+  GET("https://data.cityofnewyork.us/resource/ia2d-e54m.csv") |> 
+  content()
+
+nyc_water_df
+```
+
+^ use `content()`, sometimes `content("parsed")` to separate data as is in the dataset. `parsed` occassionaly you can request content, and sometimes it will help the data separate more thoughtfully. this code chunk extracts the data from the API request. 
+
+```{r}
+brfss_smart2010 = 
+  GET("https://data.cdc.gov/resource/acme-vg9e.csv",
+      query = list("$limit" = 5000)) |> 
+  content()
+
+brfss_smart2010
+```
+
+benefits of using API rather than downloading data as .csv, if the data is updated later on you want to be able to reproduce results easily rather than redoing or reuploading new dataset. 
+
+pokemon example:
+
+```{r}
+poke = 
+  GET("https://pokeapi.co/api/v2/pokemon/ditto") |>
+  content()
+
+poke$name
+```
+
+once you can download all the info you need from an API, sometimes they can be nicely structured and sometimes they are just a bunch of jumbled data, that you'll then need to reorganize later. 
+
+
+
+
+
+
+
+
+

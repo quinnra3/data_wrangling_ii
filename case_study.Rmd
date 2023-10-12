@@ -56,10 +56,10 @@ where are the most expensive AirBnBs by borough?
 ```{r}
 nyc_airbnb |> 
   group_by(borough, room_type) |> 
-  summarize(median_price = median(price)) |> 
+  summarize(mean_price = mean(price)) |> 
   pivot_wider(
     names_from = room_type,
-    values_from = median_price
+    values_from = mean_price
   )
 ```
 
