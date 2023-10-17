@@ -1,0 +1,132 @@
+---
+title: "Strings and Factors"
+output: html_document
+date: "2023-10-10"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## Strings and manipulations
+
+```{r}
+string_vec = c("my", "name", "is", "jeff")
+
+str_detect(string_vec, "jeff")
+```
+
+^ `str_detect`, you want to use to find something that exists. use in conjunction with `filter` to get rid of things that don't have a specific pattern match 
+
+```{r}
+str_replace(string_vec, "jeff", "Jeff")
+```
+
+^ `str_replace` replaces characters in string vectors
+
+```{r}
+string_vec = c(
+  "i think we all rule for participating",
+  "i think i have been caught",
+  "i think this will be quite fun actually",
+  "it will be fun, i think"
+  )
+
+str_detect(string_vec, "i think")
+str_detect(string_vec, "^i think")
+str_detect(string_vec, "i think$")
+
+```
+
+^ use `^` to indicate the line starts there, to indicate the first three rather than in the entire sentence. `$` does the opposite, for the end of the sentence
+
+```{r}
+string_vec = c(
+  "Time for a Pumpkin Spice Latte!",
+  "went to the #pumpkinpatch last weekend",
+  "Pumpkin Pie is obviously the best pie",
+  "SMASHING PUMPKINS -- LIVE IN CONCERT!!"
+  )
+
+str_detect(string_vec,"Pumpkin")
+str_detect(string_vec,"pumpkin")
+str_detect(string_vec,"[Pp]umpkin")
+```
+
+^`[]` indicates that you can match one thing or the other thing (both? only one or the other?)
+
+```{r}
+string_vec = c(
+  '7th inning stretch',
+  '1st half soon to begin. Texas won the toss.',
+  'she is 5 feet 4 inches tall',
+  '3AM - cant sleep :('
+  )
+
+str_detect(string_vec, "[0-9]")
+str_detect(string_vec, "^[0-9]")
+str_detect(string_vec, "^[0-9][a-zA-Z]")
+```
+
+^`[]` any instance that matches any number 0-9, add `^` to indicate first line, can layer `[]` to build
+
+```{r}
+string_vec = c(
+  'Its 7:11 in the evening',
+  'want to go to 7-11?',
+  'my flight is AA711',
+  'NetBios: scanning ip 203.167.114.66'
+  )
+
+str_detect(string_vec, "7.11")
+```
+
+^ `.` selects anything from the selected choices (eg "7, 11")
+
+```{r}
+string_vec = c(
+  'The CI is [2, 5]',
+  ':-]',
+  ':-[',
+  'I found the answer on pages [6-7]'
+  )
+
+str_detect(string_vec, "\\[")
+str_detect(string_vec, "\\[[0-9]")
+```
+
+^ in order to detect "[", it tyipcally gets interpreted as a regular expression function. "[" is a special character and needs to be designated by "\\". ("\" is also a special character, so add another one)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
